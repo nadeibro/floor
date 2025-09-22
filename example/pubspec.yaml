@@ -7,7 +7,8 @@ homepage: https://pinchbv.github.io/floor/
 publish_to: none
 
 environment:
-  sdk: '>=3.2.6 <4.0.0'
+  sdk: ">=3.7.0 <4.0.0"
+  flutter: ">=3.29.0 <4.0.0"
 
 dependencies:
   floor:
@@ -17,10 +18,10 @@ dependencies:
   sqflite: any # This dependency is needed to solve the problem with warning about transitive dependencies
 
 dev_dependencies:
-  analyzer: ^6.4.1
-  build_runner: ^2.4.8
+  analyzer: ^8.2.0
+  build_runner: ^2.8.0
   floor_generator:
     path: ../floor_generator/
-  flutter_lints: ^3.0.1
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
