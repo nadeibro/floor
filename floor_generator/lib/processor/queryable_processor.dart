@@ -1,4 +1,10 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element.dart'
+    show
+        ClassElement,
+        FieldElement,
+        MethodElement,
+        ConstructorElement,
+        FormalParameterElement;
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/extension/set_extension.dart';
@@ -24,12 +30,11 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
   final Set<TypeConverter> queryableTypeConverters;
 
   @protected
-  QueryableProcessor(
-    this.classElement,
-    final Set<TypeConverter> typeConverters,
-  )   : _queryableProcessorError = QueryableProcessorError(classElement),
-        queryableTypeConverters = typeConverters +
-            classElement.getTypeConverters(TypeConverterScope.queryable);
+  QueryableProcessor(this.classElement, final Set<TypeConverter> typeConverters)
+    : _queryableProcessorError = QueryableProcessorError(classElement),
+      queryableTypeConverters =
+          typeConverters +
+          classElement.getTypeConverters(TypeConverterScope.queryable);
 
   @protected
   List<Field> getFields() {
@@ -41,27 +46,33 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
       ...classElement.allSupertypes.expand((type) => type.element.fields),
     ];
 
-    return fields
-        .where((fieldElement) => fieldElement.shouldBeIncluded())
-        .map((field) {
-      final typeConverter =
-          queryableTypeConverters.getClosestOrNull(field.type);
+    return fields.where((fieldElement) => fieldElement.shouldBeIncluded()).map((
+      field,
+    ) {
+      final typeConverter = queryableTypeConverters.getClosestOrNull(
+        field.type,
+      );
       return FieldProcessor(field, typeConverter).process();
     }).toList();
   }
 
   @protected
   String getConstructor(final List<Field> fields) {
-    final constructorParameters = classElement.constructors
-        .firstWhereOrNull((element) => element.isPublic && !element.isFactory)
-        ?.parameters;
+    // analyzer 8.x: use .formalParameters instead of .parameters
+    final constructorParameters =
+        classElement.constructors
+            .firstWhereOrNull(
+              (element) => element.isPublic && !element.isFactory,
+            )
+            ?.formalParameters;
 
     if (constructorParameters == null) {
       throw _queryableProcessorError.missingUnnamedConstructor;
     } else {
       final parameterValues = constructorParameters
-          .map((parameterElement) =>
-              _getParameterValue(parameterElement, fields))
+          .map(
+            (parameterElement) => _getParameterValue(parameterElement, fields),
+          )
           .where((parameterValue) => parameterValue != null)
           .join(', ');
 
@@ -71,21 +82,22 @@ abstract class QueryableProcessor<T extends Queryable> extends Processor<T> {
 
   /// Returns `null` whenever field is @ignored
   String? _getParameterValue(
-    final ParameterElement parameterElement,
+    final FormalParameterElement parameterElement,
     final List<Field> fields,
   ) {
     final parameterName = parameterElement.displayName;
     final field =
-        // null whenever field is @ignored
-        fields.firstWhereOrNull((field) => field.name == parameterName);
+    // null whenever field is @ignored
+    fields.firstWhereOrNull((field) => field.name == parameterName);
     if (field != null) {
       final databaseValue = "row['${field.columnName}']";
 
       String parameterValue;
 
-      final typeConverter = [...queryableTypeConverters, field.typeConverter]
-          .whereNotNull()
-          .getClosestOrNull(parameterElement.type);
+      final typeConverter = [
+        ...queryableTypeConverters,
+        field.typeConverter,
+      ].whereNotNull().getClosestOrNull(parameterElement.type);
 
       if (typeConverter != null) {
         final castedDatabaseValue = databaseValue.cast(
@@ -123,5 +135,6 @@ extension on FieldElement {
   bool shouldBeIncluded() {
     final isIgnored = hasAnnotation(annotations.ignore.runtimeType);
     return !(isStatic || isSynthetic || isIgnored);
+    // analyzer 8.x: .name is String?, prefer .displayName elsewhere if needed
   }
 }

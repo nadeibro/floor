@@ -1,4 +1,5 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element.dart'
+    show MethodElement, FormalParameterElement;
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_generator/misc/extension/set_equality_extension.dart';
@@ -29,7 +30,7 @@ class QueryMethod {
   /// Stream<List<T>> -> T
   final DartType flattenedReturnType;
 
-  final List<ParameterElement> parameters;
+  final List<FormalParameterElement> parameters;
 
   final Queryable? queryable;
 

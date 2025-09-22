@@ -24,7 +24,8 @@ class FieldProcessor extends Processor<Field> {
 
   @override
   Field process() {
-    final name = _fieldElement.name;
+    // analyzer 8.x: .name -> String?; используем displayName (String)
+    final name = _fieldElement.displayName;
     final columnName = _getColumnName(name);
     final isNullable = _fieldElement.type.isNullable;
     final typeConverter = {
@@ -47,8 +48,14 @@ class FieldProcessor extends Processor<Field> {
         ? _fieldElement
                 .getAnnotation(annotations.ColumnInfo)
                 ?.getField(AnnotationField.columnInfoName)
-                ?.toStringValue() ??
-            name
+                ?.toStringValue()
+                ?.trim()
+                .isNotEmpty == true
+            ? _fieldElement
+                .getAnnotation(annotations.ColumnInfo)!
+                .getField(AnnotationField.columnInfoName)!
+                .toStringValue()!
+            : name
         : name;
   }
 

@@ -34,7 +34,10 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   @override
   QueryMethod process() {
     final name = _methodElement.displayName;
-    final parameters = _methodElement.parameters;
+
+    // analyzer 8.x: параметры берём из formalParameters (List<FormalParameterElement>)
+    final parameters = _methodElement.formalParameters;
+
     final rawReturnType = _methodElement.returnType;
 
     final query = QueryProcessor(_methodElement, _getQuery()).process();
@@ -81,7 +84,7 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       query,
       rawReturnType,
       flattenedReturnType,
-      parameters,
+      parameters, // теперь List<FormalParameterElement>
       queryable,
       allTypeConverters,
     );

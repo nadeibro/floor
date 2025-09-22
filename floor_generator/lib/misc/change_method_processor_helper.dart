@@ -1,4 +1,5 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element.dart'
+    show MethodElement, FormalParameterElement;
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -15,8 +16,8 @@ class ChangeMethodProcessorHelper {
   )   : _methodElement = methodElement,
         _entities = entities;
 
-  ParameterElement getParameterElement() {
-    final parameters = _methodElement.parameters;
+  FormalParameterElement getParameterElement() {
+    final parameters = _methodElement.formalParameters;
     if (parameters.isEmpty) {
       throw InvalidGenerationSourceError(
         'There is no parameter supplied for this method. Please add one.',
@@ -32,7 +33,7 @@ class ChangeMethodProcessorHelper {
   }
 
   DartType getFlattenedParameterType(
-    final ParameterElement parameterElement,
+    final FormalParameterElement parameterElement,
   ) {
     final changesMultipleItems = parameterElement.type.isDartCoreList;
 
@@ -43,11 +44,13 @@ class ChangeMethodProcessorHelper {
 
   Entity getEntity(final DartType flattenedParameterType) {
     return _entities.firstWhere(
-        (entity) =>
-            entity.classElement.displayName ==
-            flattenedParameterType.getDisplayString(withNullability: false),
-        orElse: () => throw InvalidGenerationSourceError(
-            'You are trying to change an object which is not an entity.',
-            element: _methodElement));
+      (entity) =>
+          entity.classElement.displayName ==
+          flattenedParameterType.getDisplayString(withNullability: false),
+      orElse: () => throw InvalidGenerationSourceError(
+        'You are trying to change an object which is not an entity.',
+        element: _methodElement,
+      ),
+    );
   }
 }

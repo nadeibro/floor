@@ -1,4 +1,5 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element.dart'
+    show MethodElement, FormalParameterElement;
 import 'package:floor_generator/processor/error/processor_error.dart';
 
 class QueryProcessorError {
@@ -8,7 +9,7 @@ class QueryProcessorError {
       : _methodElement = methodElement;
 
   ProcessorError unusedQueryMethodParameter(
-    final ParameterElement parameterElement,
+    final FormalParameterElement parameterElement,
   ) {
     return ProcessorError(
       message: 'Query method parameters have to be used.',
@@ -35,8 +36,8 @@ class QueryProcessorError {
     final name = varName.substring(1);
     return ProcessorError(
       message:
-          'The parameter $name should be referenced like a list (`x IN ($varName)`)',
-      todo: 'Change the type of $name to not be a List<> or'
+          'The parameter $name should be referenced like a list (`x IN ($varName)`).',
+      todo: 'Change the type of $name to not be a List<> or '
           'reference it with ` IN ($varName)` (including the parentheses).',
       element: _methodElement,
     );
@@ -47,15 +48,15 @@ class QueryProcessorError {
   ) {
     final name = varName.substring(1);
     return ProcessorError(
-      message: 'The parameter $name should be referenced without `IN`',
-      todo: 'Change the type of $name to be a List<> or'
+      message: 'The parameter $name should be referenced without `IN`.',
+      todo: 'Change the type of $name to be a List<> or '
           'reference it without `IN`, e.g. `IS $varName`.',
       element: _methodElement,
     );
   }
 
   ProcessorError queryMethodParameterIsNullable(
-    final ParameterElement parameterElement,
+    final FormalParameterElement parameterElement,
   ) {
     return ProcessorError(
       message: 'Query method parameters have to be non-nullable.',

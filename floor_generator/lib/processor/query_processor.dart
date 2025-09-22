@@ -1,4 +1,5 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element.dart'
+    show MethodElement, FormalParameterElement;
 import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
@@ -9,10 +10,10 @@ class QueryProcessor extends Processor<Query> {
 
   final String _query;
 
-  final List<ParameterElement> _parameters;
+  final List<FormalParameterElement> _parameters;
 
   QueryProcessor(MethodElement methodElement, this._query)
-      : _parameters = methodElement.parameters,
+      : _parameters = methodElement.formalParameters,
         _processorError = QueryProcessorError(methodElement);
 
   @override
@@ -21,47 +22,48 @@ class QueryProcessor extends Processor<Query> {
 
     final indices = <String, int>{};
     final fixedParameters = <String>{};
-    //map parameters to index (1-based) or 0 (if its a list)
+    // map parameters to index (1-based) or 0 (if it's a list)
     int currentIndex = 1;
     for (final parameter in _parameters) {
+      final name = parameter.displayName;
       if (parameter.type.isDartCoreList) {
-        indices[':${parameter.name}'] = 0;
+        indices[':$name'] = 0;
       } else {
-        fixedParameters.add(parameter.name);
-        indices[':${parameter.name}'] = currentIndex++;
+        fixedParameters.add(name);
+        indices[':$name'] = currentIndex++;
       }
     }
 
-    //get List of query variables
+    // get list of query variables
     final variables = findVariables(_query);
     _assertAllParametersAreUsed(variables);
 
     final newQuery = StringBuffer();
     final listParameters = <ListParameter>[];
-    // iterate over all found variables, replace them with their assigned
-    // numbered variable (?1,?2,...) or a placeholder if the variable is a list.
-    // the list variables have to be handled in the writer, so write down their
-    // positions and names.
+    // iterate over all found variables, replace them with assigned indices
+    // (?1, ?2, ...) or with a placeholder if the variable is a list
     int currentLast = 0;
     for (final varToken in variables) {
-      newQuery.write(_query
-          .substring(currentLast, varToken.startPosition)
-          .replaceAll('\n', ' '));
+      newQuery.write(
+        _query.substring(currentLast, varToken.startPosition).replaceAll('\n', ' '),
+      );
       final varIndexInMethod = indices[varToken.name];
       if (varIndexInMethod == null) {
         throw _processorError.unknownQueryVariable(varToken.name);
       } else if (varIndexInMethod > 0) {
-        //normal variable/parameter
-        if (varToken.isListVar)
+        // normal variable/parameter
+        if (varToken.isListVar) {
           throw _processorError
               .queryMethodParameterIsNormalButVariableIsList(varToken.name);
+        }
         newQuery.write('?');
         newQuery.write(varIndexInMethod);
       } else {
-        //list variable/parameter
-        if (!varToken.isListVar)
+        // list variable/parameter
+        if (!varToken.isListVar) {
           throw _processorError
               .queryMethodParameterIsListButVariableIsNot(varToken.name);
+        }
         listParameters
             .add(ListParameter(newQuery.length, varToken.name.substring(1)));
         newQuery.write(varlistPlaceholder);
@@ -95,7 +97,7 @@ class QueryProcessor extends Processor<Query> {
 }
 
 /// Treats the incoming String as an Sqlite query and tries to find all used
-/// sqlite variables. Also try do identify List variables by looking at their
+/// sqlite variables. Also try to identify List variables by looking at their
 /// context.
 List<VariableToken> findVariables(final String query) {
   final output = <VariableToken>[];
@@ -106,7 +108,8 @@ List<VariableToken> findVariables(final String query) {
     if (expectsList) {
       final varname = match.group(1)!;
       output.add(
-          VariableToken(varname, query.indexOf(varname, match.start), true));
+        VariableToken(varname, query.indexOf(varname, match.start), true),
+      );
     } else {
       output.add(VariableToken(content, match.start, false));
     }
@@ -119,12 +122,10 @@ class VariableToken {
   /// the variable name including `:` (e.g. `:foo`)
   final String name;
 
-  /// the offset within the query, where the variable name starts. Useful for
-  /// splitting the query here.
+  /// the offset within the query, where the variable name starts
   final int startPosition;
 
-  /// the offset within the query, where the variable name ends. Useful for
-  /// splitting the query here.
+  /// the offset within the query, where the variable name ends
   int get endPosition => startPosition + name.length;
 
   /// denotes if the variable was determined to contain a list

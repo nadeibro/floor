@@ -27,7 +27,8 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
 
   @override
   UpdateMethod process() {
-    final name = _methodElement.name;
+    // analyzer 8.x: .name -> String?; используем displayName (String)
+    final name = _methodElement.displayName;
     final returnType = _methodElement.returnType;
 
     _assertMethodReturnsFuture(returnType);

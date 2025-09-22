@@ -40,7 +40,8 @@ class QueryMethodWriter implements Writer {
   List<Parameter> _generateMethodParameters() {
     return _queryMethod.parameters.map((parameter) {
       return Parameter((builder) => builder
-        ..name = parameter.name
+        // analyzer 8.x: Element.name is String?; use displayName (String)
+        ..name = parameter.displayName
         ..type = refer(parameter.type.getDisplayString(
           // processor disallows nullable method parameters and throws if found,
           // still interested in nullability here to future-proof codebase

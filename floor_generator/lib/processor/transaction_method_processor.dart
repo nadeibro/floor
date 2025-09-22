@@ -12,15 +12,17 @@ class TransactionMethodProcessor implements Processor<TransactionMethod> {
     final MethodElement methodElement,
     final String daoGetterName,
     final String databaseName,
-  )   : _methodElement = methodElement,
-        _daoGetterName = daoGetterName,
-        _databaseName = databaseName;
+  ) : _methodElement = methodElement,
+      _daoGetterName = daoGetterName,
+      _databaseName = databaseName;
 
   @override
   TransactionMethod process() {
+    // analyzer 8.x: use displayName (String) and formalParameters
     final name = _methodElement.displayName;
     final returnType = _methodElement.returnType;
-    final parameterElements = _methodElement.parameters;
+    final parameterElements =
+        _methodElement.formalParameters; // List<FormalParameterElement>
 
     if (!returnType.isDartAsyncFuture) {
       throw TransactionMethodProcessorError(_methodElement).shouldReturnFuture;

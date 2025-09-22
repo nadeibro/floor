@@ -1,11 +1,12 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element.dart'
+    show MethodElement, FormalParameterElement;
 import 'package:analyzer/dart/element/type.dart';
 
 class TransactionMethod {
   final MethodElement methodElement;
-  final String name;
+  final String name; // pass methodElement.displayName when constructing
   final DartType returnType;
-  final List<ParameterElement> parameterElements;
+  final List<FormalParameterElement> parameterElements;
   final String daoFieldName;
   final String databaseName;
 

@@ -50,7 +50,7 @@ extension AnnotationChecker on Element {
   }
 }
 
-TypeChecker _typeChecker(final Type type) => TypeChecker.fromRuntime(type);
+TypeChecker _typeChecker(final Type type) => TypeChecker.typeNamed(type);
 
 final _stringTypeChecker = _typeChecker(String);
 

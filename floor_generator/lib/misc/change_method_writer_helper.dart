@@ -27,7 +27,10 @@ class ChangeMethodWriterHelper {
     final parameter = _changeMethod.parameterElement;
 
     return Parameter((builder) => builder
-      ..name = parameter.name
-      ..type = refer(parameter.type.getDisplayString(withNullability: false)));
+      // analyzer 8.x: Element.name -> String?; use displayName (String)
+      ..name = parameter.displayName
+      ..type = refer(
+        parameter.type.getDisplayString(withNullability: false),
+      ));
   }
 }
