@@ -1,12 +1,13 @@
 import 'package:analyzer/dart/constant/value.dart';
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:source_gen/source_gen.dart';
 
 class EntityProcessorError {
-  final ClassElement _classElement;
+  final ClassElement2 _classElement;
 
-  EntityProcessorError(final ClassElement classElement)
-      : _classElement = classElement;
+  EntityProcessorError(final ClassElement2 classElement)
+    : _classElement = classElement;
 
   InvalidGenerationSourceError get missingPrimaryKey {
     return InvalidGenerationSourceError(
@@ -59,9 +60,7 @@ class EntityProcessorError {
     );
   }
 
-  InvalidGenerationSourceError noMatchingColumn(
-    final String columnName,
-  ) {
+  InvalidGenerationSourceError noMatchingColumn(final String columnName) {
     return InvalidGenerationSourceError(
       'No matching column found for the given index. (`$columnName`)',
       todo:
@@ -71,7 +70,9 @@ class EntityProcessorError {
   }
 
   InvalidGenerationSourceError wrongForeignKeyAction(
-      DartObject field, String triggerName) {
+    DartObject field,
+    String triggerName,
+  ) {
     return InvalidGenerationSourceError(
       'No ForeignKeyAction with the value $field exists for the $triggerName trigger.',
       todo:

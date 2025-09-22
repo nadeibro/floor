@@ -1,12 +1,12 @@
-import 'package:analyzer/dart/element/element.dart'
-    show MethodElement, FormalParameterElement;
+import 'package:analyzer/dart/element/element2.dart'
+    show MethodElement2, FormalParameterElement;
 import 'package:floor_generator/processor/error/processor_error.dart';
 
 class QueryProcessorError {
-  final MethodElement _methodElement;
+  final MethodElement2 _methodElement;
 
-  QueryProcessorError(final MethodElement methodElement)
-      : _methodElement = methodElement;
+  QueryProcessorError(final MethodElement2 methodElement)
+    : _methodElement = methodElement;
 
   ProcessorError unusedQueryMethodParameter(
     final FormalParameterElement parameterElement,
@@ -18,9 +18,7 @@ class QueryProcessorError {
     );
   }
 
-  ProcessorError unknownQueryVariable(
-    final String variableName,
-  ) {
+  ProcessorError unknownQueryVariable(final String variableName) {
     return ProcessorError(
       message:
           'Query variable `$variableName` has to exist as a method parameter.',
@@ -37,7 +35,8 @@ class QueryProcessorError {
     return ProcessorError(
       message:
           'The parameter $name should be referenced like a list (`x IN ($varName)`).',
-      todo: 'Change the type of $name to not be a List<> or '
+      todo:
+          'Change the type of $name to not be a List<> or '
           'reference it with ` IN ($varName)` (including the parentheses).',
       element: _methodElement,
     );
@@ -49,7 +48,8 @@ class QueryProcessorError {
     final name = varName.substring(1);
     return ProcessorError(
       message: 'The parameter $name should be referenced without `IN`.',
-      todo: 'Change the type of $name to be a List<> or '
+      todo:
+          'Change the type of $name to be a List<> or '
           'reference it without `IN`, e.g. `IS $varName`.',
       element: _methodElement,
     );
@@ -60,7 +60,8 @@ class QueryProcessorError {
   ) {
     return ProcessorError(
       message: 'Query method parameters have to be non-nullable.',
-      todo: 'Define ${parameterElement.displayName} as non-nullable.'
+      todo:
+          'Define ${parameterElement.displayName} as non-nullable.'
           '\nIf you want to assert null, change your query to use the `IS NULL`/'
           '`IS NOT NULL` operator without passing a nullable parameter.',
       element: parameterElement,

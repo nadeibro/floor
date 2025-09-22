@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
 import 'package:floor_generator/misc/constants.dart';
 import 'package:floor_generator/misc/extension/iterable_extension.dart';
@@ -7,7 +7,7 @@ import 'package:floor_generator/processor/error/processor_error.dart';
 import 'package:floor_generator/processor/type_converter_processor.dart';
 import 'package:floor_generator/value_object/type_converter.dart';
 
-extension TypeConverterElementExtension on Element {
+extension TypeConverterElementExtension on Element2 {
   /// Returns a set of [TypeConverter]s found in the @TypeConverters
   /// annotation on this element
   Set<TypeConverter> getTypeConverters(final TypeConverterScope scope) {
@@ -26,11 +26,12 @@ extension TypeConverterElementExtension on Element {
         );
       }
 
-      final typeConverterClassElements =
-          typeConverterElements.cast<ClassElement>();
+      final typeConverterClassElement2s =
+          typeConverterElements.cast<ClassElement2>();
 
-      if (typeConverterClassElements
-          .any((element) => !element.isTypeConverter)) {
+      if (typeConverterClassElement2s.any(
+        (element) => !element.isTypeConverter,
+      )) {
         throw ProcessorError(
           message:
               'Only classes that inherit from TypeConverter can be used as type converters.',
@@ -39,7 +40,7 @@ extension TypeConverterElementExtension on Element {
         );
       }
 
-      return typeConverterClassElements
+      return typeConverterClassElement2s
           .map((element) => TypeConverterProcessor(element, scope).process())
           .toSet();
     } else {
@@ -48,6 +49,6 @@ extension TypeConverterElementExtension on Element {
   }
 }
 
-extension on ClassElement {
+extension on ClassElement2 {
   bool get isTypeConverter => supertype?.element.displayName == 'TypeConverter';
 }

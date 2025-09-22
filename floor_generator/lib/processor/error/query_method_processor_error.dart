@@ -1,12 +1,13 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:floor_generator/processor/error/processor_error.dart';
 import 'package:source_gen/source_gen.dart';
 
 class QueryMethodProcessorError {
-  final MethodElement _methodElement;
+  final MethodElement2 _methodElement;
 
-  QueryMethodProcessorError(final MethodElement methodElement)
-      : _methodElement = methodElement;
+  QueryMethodProcessorError(final MethodElement2 methodElement)
+    : _methodElement = methodElement;
 
   InvalidGenerationSourceError get noQueryDefined {
     return InvalidGenerationSourceError(

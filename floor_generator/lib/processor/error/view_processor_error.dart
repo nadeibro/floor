@@ -1,11 +1,11 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:source_gen/source_gen.dart';
 
 class ViewProcessorError {
-  final ClassElement _classElement;
+  final ClassElement2 _classElement;
 
-  ViewProcessorError(final ClassElement classElement)
-      : _classElement = classElement;
+  ViewProcessorError(final ClassElement2 classElement)
+    : _classElement = classElement;
 
   InvalidGenerationSourceError get missingQuery {
     return InvalidGenerationSourceError(

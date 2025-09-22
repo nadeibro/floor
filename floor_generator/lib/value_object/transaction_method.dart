@@ -1,9 +1,9 @@
-import 'package:analyzer/dart/element/element.dart'
-    show MethodElement, FormalParameterElement;
+import 'package:analyzer/dart/element/element2.dart'
+    show MethodElement2, FormalParameterElement;
 import 'package:analyzer/dart/element/type.dart';
 
 class TransactionMethod {
-  final MethodElement methodElement;
+  final MethodElement2 methodElement;
   final String name; // pass methodElement.displayName when constructing
   final DartType returnType;
   final List<FormalParameterElement> parameterElements;

@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
@@ -18,18 +18,18 @@ import 'package:floor_generator/value_object/type_converter.dart';
 class QueryMethodProcessor extends Processor<QueryMethod> {
   final QueryMethodProcessorError _processorError;
 
-  final MethodElement _methodElement;
+  final MethodElement2 _methodElement;
   final List<Queryable> _queryables;
   final Set<TypeConverter> _typeConverters;
 
   QueryMethodProcessor(
-    final MethodElement methodElement,
+    final MethodElement2 methodElement,
     final List<Queryable> queryables,
     final Set<TypeConverter> typeConverters,
-  )   : _methodElement = methodElement,
-        _queryables = queryables,
-        _typeConverters = typeConverters,
-        _processorError = QueryMethodProcessorError(methodElement);
+  ) : _methodElement = methodElement,
+      _queryables = queryables,
+      _typeConverters = typeConverters,
+      _processorError = QueryMethodProcessorError(methodElement);
 
   @override
   QueryMethod process() {
@@ -59,22 +59,30 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
       flattenedReturnType,
     );
 
-    final queryable = _queryables.firstWhereOrNull((queryable) =>
-        queryable.classElement.displayName ==
-        flattenedReturnType.getDisplayString(withNullability: false));
+    final queryable = _queryables.firstWhereOrNull(
+      (queryable) =>
+          queryable.classElement.displayName ==
+          flattenedReturnType.getDisplayString(withNullability: false),
+    );
 
-    final parameterTypeConverters = parameters
-        .expand((parameter) =>
-            parameter.getTypeConverters(TypeConverterScope.daoMethodParameter))
-        .toSet();
+    final parameterTypeConverters =
+        parameters
+            .expand(
+              (parameter) => parameter.getTypeConverters(
+                TypeConverterScope.daoMethodParameter,
+              ),
+            )
+            .toSet();
 
-    final allTypeConverters = _typeConverters +
+    final allTypeConverters =
+        _typeConverters +
         _methodElement.getTypeConverters(TypeConverterScope.daoMethod) +
         parameterTypeConverters;
 
     if (queryable != null) {
-      final fieldTypeConverters =
-          queryable.fields.mapNotNull((field) => field.typeConverter);
+      final fieldTypeConverters = queryable.fields.mapNotNull(
+        (field) => field.typeConverter,
+      );
       allTypeConverters.addAll(fieldTypeConverters);
     }
 
@@ -91,11 +99,12 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
   }
 
   String _getQuery() {
-    final query = _methodElement
-        .getAnnotation(annotations.Query)
-        ?.getField(AnnotationField.queryValue)
-        ?.toStringValue()
-        ?.trim();
+    final query =
+        _methodElement
+            .getAnnotation(annotations.Query)
+            ?.getField(AnnotationField.queryValue)
+            ?.toStringValue()
+            ?.trim();
 
     if (query == null || query.isEmpty) throw _processorError.noQueryDefined;
     return query;
@@ -106,16 +115,18 @@ class QueryMethodProcessor extends Processor<QueryMethod> {
     final bool returnsStream,
     final bool returnsList,
   ) {
-    final type = returnsStream
-        ? _methodElement.returnType.flatten()
-        : _methodElement.library.typeSystem.flatten(rawReturnType);
+    final type =
+        returnsStream
+            ? _methodElement.returnType.flatten()
+            : _methodElement.library2.typeSystem.flatten(rawReturnType);
     return returnsList ? type.flatten() : type;
   }
 
   bool _getReturnsList(final DartType returnType, final bool returnsStream) {
-    final type = returnsStream
-        ? returnType.flatten()
-        : _methodElement.library.typeSystem.flatten(returnType);
+    final type =
+        returnsStream
+            ? returnType.flatten()
+            : _methodElement.library2.typeSystem.flatten(returnType);
 
     return type.isDartCoreList;
   }

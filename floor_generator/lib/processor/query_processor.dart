@@ -1,5 +1,5 @@
-import 'package:analyzer/dart/element/element.dart'
-    show MethodElement, FormalParameterElement;
+import 'package:analyzer/dart/element/element2.dart'
+    show MethodElement2, FormalParameterElement;
 import 'package:floor_generator/misc/extension/dart_type_extension.dart';
 import 'package:floor_generator/processor/error/query_processor_error.dart';
 import 'package:floor_generator/processor/processor.dart';
@@ -12,9 +12,9 @@ class QueryProcessor extends Processor<Query> {
 
   final List<FormalParameterElement> _parameters;
 
-  QueryProcessor(MethodElement methodElement, this._query)
-      : _parameters = methodElement.formalParameters,
-        _processorError = QueryProcessorError(methodElement);
+  QueryProcessor(MethodElement2 methodElement, this._query)
+    : _parameters = methodElement.formalParameters,
+      _processorError = QueryProcessorError(methodElement);
 
   @override
   Query process() {
@@ -45,7 +45,9 @@ class QueryProcessor extends Processor<Query> {
     int currentLast = 0;
     for (final varToken in variables) {
       newQuery.write(
-        _query.substring(currentLast, varToken.startPosition).replaceAll('\n', ' '),
+        _query
+            .substring(currentLast, varToken.startPosition)
+            .replaceAll('\n', ' '),
       );
       final varIndexInMethod = indices[varToken.name];
       if (varIndexInMethod == null) {
@@ -53,29 +55,29 @@ class QueryProcessor extends Processor<Query> {
       } else if (varIndexInMethod > 0) {
         // normal variable/parameter
         if (varToken.isListVar) {
-          throw _processorError
-              .queryMethodParameterIsNormalButVariableIsList(varToken.name);
+          throw _processorError.queryMethodParameterIsNormalButVariableIsList(
+            varToken.name,
+          );
         }
         newQuery.write('?');
         newQuery.write(varIndexInMethod);
       } else {
         // list variable/parameter
         if (!varToken.isListVar) {
-          throw _processorError
-              .queryMethodParameterIsListButVariableIsNot(varToken.name);
+          throw _processorError.queryMethodParameterIsListButVariableIsNot(
+            varToken.name,
+          );
         }
-        listParameters
-            .add(ListParameter(newQuery.length, varToken.name.substring(1)));
+        listParameters.add(
+          ListParameter(newQuery.length, varToken.name.substring(1)),
+        );
         newQuery.write(varlistPlaceholder);
       }
       currentLast = varToken.endPosition;
     }
     newQuery.write(_query.substring(currentLast).replaceAll('\n', ' '));
 
-    return Query(
-      newQuery.toString(),
-      listParameters,
-    );
+    return Query(newQuery.toString(), listParameters);
   }
 
   void _assertNoNullableParameters() {
@@ -101,8 +103,9 @@ class QueryProcessor extends Processor<Query> {
 /// context.
 List<VariableToken> findVariables(final String query) {
   final output = <VariableToken>[];
-  for (final match
-      in RegExp(r':[\w]+| [iI][nN]\s*\((:[\w]+)\)').allMatches(query)) {
+  for (final match in RegExp(
+    r':[\w]+| [iI][nN]\s*\((:[\w]+)\)',
+  ).allMatches(query)) {
     final content = match.group(0)!;
     final expectsList = content.toLowerCase().startsWith(' in');
     if (expectsList) {

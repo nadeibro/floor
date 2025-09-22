@@ -1,6 +1,7 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/dart/element/type.dart';
-import 'package:floor_annotation/floor_annotation.dart' as annotations
+import 'package:floor_annotation/floor_annotation.dart'
+    as annotations
     show Update;
 import 'package:floor_generator/misc/change_method_processor_helper.dart';
 import 'package:floor_generator/misc/constants.dart';
@@ -12,18 +13,19 @@ import 'package:floor_generator/value_object/entity.dart';
 import 'package:floor_generator/value_object/update_method.dart';
 
 class UpdateMethodProcessor implements Processor<UpdateMethod> {
-  final MethodElement _methodElement;
+  final MethodElement2 _methodElement;
   final ChangeMethodProcessorHelper _helper;
   final ChangeMethodProcessorError _errors;
 
   UpdateMethodProcessor(
-    final MethodElement methodElement,
+    final MethodElement2 methodElement,
     final List<Entity> entities, [
     final ChangeMethodProcessorHelper? changeMethodProcessorHelper,
-  ])  : _methodElement = methodElement,
-        _errors = ChangeMethodProcessorError(methodElement, 'Update'),
-        _helper = changeMethodProcessorHelper ??
-            ChangeMethodProcessorHelper(methodElement, entities);
+  ]) : _methodElement = methodElement,
+       _errors = ChangeMethodProcessorError(methodElement, 'Update'),
+       _helper =
+           changeMethodProcessorHelper ??
+           ChangeMethodProcessorHelper(methodElement, entities);
 
   @override
   UpdateMethod process() {
@@ -44,8 +46,9 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
     }
 
     final parameterElement = _helper.getParameterElement();
-    final flattenedParameterType =
-        _helper.getFlattenedParameterType(parameterElement);
+    final flattenedParameterType = _helper.getFlattenedParameterType(
+      parameterElement,
+    );
     final entity = _helper.getEntity(flattenedParameterType);
     final onConflict = _getOnConflictStrategy();
 
@@ -61,10 +64,11 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
   }
 
   String _getOnConflictStrategy() {
-    final onConflictStrategy = _methodElement
-        .getAnnotation(annotations.Update)
-        ?.getField(AnnotationField.onConflict)
-        ?.toEnumValueString();
+    final onConflictStrategy =
+        _methodElement
+            .getAnnotation(annotations.Update)
+            ?.getField(AnnotationField.onConflict)
+            ?.toEnumValueString();
 
     if (onConflictStrategy == null) {
       throw _errors.wrongOnConflictValue;
@@ -74,7 +78,7 @@ class UpdateMethodProcessor implements Processor<UpdateMethod> {
   }
 
   DartType _getFlattenedReturnType(final DartType returnType) {
-    return _methodElement.library.typeSystem.flatten(returnType);
+    return _methodElement.library2.typeSystem.flatten(returnType);
   }
 
   void _assertMethodReturnsNoList(final DartType flattenedReturnType) {

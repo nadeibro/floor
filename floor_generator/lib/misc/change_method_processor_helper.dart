@@ -1,5 +1,5 @@
-import 'package:analyzer/dart/element/element.dart'
-    show MethodElement, FormalParameterElement;
+import 'package:analyzer/dart/element/element2.dart'
+    show MethodElement2, FormalParameterElement;
 import 'package:analyzer/dart/element/type.dart';
 import 'package:floor_generator/misc/type_utils.dart';
 import 'package:floor_generator/value_object/entity.dart';
@@ -7,14 +7,14 @@ import 'package:source_gen/source_gen.dart';
 
 /// Groups common functionality of change method processors.
 class ChangeMethodProcessorHelper {
-  final MethodElement _methodElement;
+  final MethodElement2 _methodElement;
   final List<Entity> _entities;
 
   const ChangeMethodProcessorHelper(
-    final MethodElement methodElement,
+    final MethodElement2 methodElement,
     final List<Entity> entities,
-  )   : _methodElement = methodElement,
-        _entities = entities;
+  ) : _methodElement = methodElement,
+      _entities = entities;
 
   FormalParameterElement getParameterElement() {
     final parameters = _methodElement.formalParameters;
@@ -47,10 +47,12 @@ class ChangeMethodProcessorHelper {
       (entity) =>
           entity.classElement.displayName ==
           flattenedParameterType.getDisplayString(withNullability: false),
-      orElse: () => throw InvalidGenerationSourceError(
-        'You are trying to change an object which is not an entity.',
-        element: _methodElement,
-      ),
+      orElse:
+          () =>
+              throw InvalidGenerationSourceError(
+                'You are trying to change an object which is not an entity.',
+                element: _methodElement,
+              ),
     );
   }
 }

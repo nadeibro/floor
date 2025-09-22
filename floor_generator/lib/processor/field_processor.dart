@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/element2.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:collection/collection.dart';
 import 'package:floor_annotation/floor_annotation.dart' as annotations;
@@ -13,14 +13,14 @@ import 'package:floor_generator/value_object/type_converter.dart';
 import 'package:source_gen/source_gen.dart';
 
 class FieldProcessor extends Processor<Field> {
-  final FieldElement _fieldElement;
+  final FieldElement2 _fieldElement;
   final TypeConverter? _typeConverter;
 
   FieldProcessor(
-    final FieldElement fieldElement,
+    final FieldElement2 fieldElement,
     final TypeConverter? typeConverter,
-  )   : _fieldElement = fieldElement,
-        _typeConverter = typeConverter;
+  ) : _fieldElement = fieldElement,
+      _typeConverter = typeConverter;
 
   @override
   Field process() {
@@ -28,10 +28,11 @@ class FieldProcessor extends Processor<Field> {
     final name = _fieldElement.displayName;
     final columnName = _getColumnName(name);
     final isNullable = _fieldElement.type.isNullable;
-    final typeConverter = {
-      ..._fieldElement.getTypeConverters(TypeConverterScope.field),
-      _typeConverter
-    }.whereNotNull().closestOrNull;
+    final typeConverter =
+        {
+          ..._fieldElement.getTypeConverters(TypeConverterScope.field),
+          _typeConverter,
+        }.whereNotNull().closestOrNull;
 
     return Field(
       _fieldElement,
@@ -46,11 +47,12 @@ class FieldProcessor extends Processor<Field> {
   String _getColumnName(final String name) {
     return _fieldElement.hasAnnotation(annotations.ColumnInfo)
         ? _fieldElement
-                .getAnnotation(annotations.ColumnInfo)
-                ?.getField(AnnotationField.columnInfoName)
-                ?.toStringValue()
-                ?.trim()
-                .isNotEmpty == true
+                    .getAnnotation(annotations.ColumnInfo)
+                    ?.getField(AnnotationField.columnInfoName)
+                    ?.toStringValue()
+                    ?.trim()
+                    .isNotEmpty ==
+                true
             ? _fieldElement
                 .getAnnotation(annotations.ColumnInfo)!
                 .getField(AnnotationField.columnInfoName)!
