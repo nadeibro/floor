@@ -13,7 +13,7 @@ environment:
   flutter: ">=3.29.0 <4.0.0"
 
 dependencies:
-  collection: ^1.19.1
+  collection: ^1.14.0
   floor_annotation:
     path: ../floor_annotation/
   floor_common:
@@ -21,14 +21,14 @@ dependencies:
   flutter:
     sdk: flutter
   meta:
-  path: ^1.9.1
+  path: ^1.8.0
   sqflite: ^2.4.2
   sqflite_common_ffi: ^2.3.6
   sqflite_common_ffi_web: ^1.0.1+1
   sqlparser: ^0.41.2
 
 dev_dependencies:
-  build_runner: ^2.8.0
+  build_runner: ^2.6.0
   floor_generator:
     path: ../floor_generator
   flutter_test:
